@@ -26,6 +26,7 @@ namespace PresentationLayer
                 Console.WriteLine("1. Демонстрація серіалізації/десеріалізації (Масив vs Колекція)");
                 Console.WriteLine("2. Обчислити кількість студенток 5-го курсу з Києва (Варіант 10)");
                 Console.WriteLine("3. Додаткове вміння (Множення великих чисел)");
+                Console.WriteLine("4. Згенерувати тестових студентів у файл students.json"); // НОВИЙ ПУНКТ
                 Console.WriteLine("0. Вихід");
                 Console.Write("Оберіть пункт: ");
 
@@ -43,6 +44,9 @@ namespace PresentationLayer
                             break;
                         case "3":
                             RunMultiplyTask();
+                            break;
+                        case "4":
+                            GenerateTestStudents(); // Виклик нового методу
                             break;
                         case "0":
                             return;
@@ -145,8 +149,8 @@ namespace PresentationLayer
                 return;
             }
 
-            Console.WriteLine("Оберіть формат (0 - Binary, 1 - JSON, 2 - XML, 3 - Custom): ");
-                string? formatInput = Console.ReadLine();
+            Console.WriteLine("Оберіть формат (0 - JSON, 1 - XML, 2 - Binary, 3 - Custom): ");
+            string? formatInput = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(formatInput) || !int.TryParse(formatInput, out int formatValue))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -183,5 +187,41 @@ namespace PresentationLayer
             Console.WriteLine($"Результат множення: {result}");
             Console.ReadLine();
         }
-    }
+
+        private void GenerateTestStudents()
+        {
+            // Створюємо масив студентів для перевірки твого варіанту
+            var testStudents = new StudentDTO[]
+            {
+             // Підходить під умову (Дівчина, 5 курс, Київ) = 1
+             new StudentDTO { FirstName = "Олена", LastName = "Коваленко", Residence = "Київ", Gender = Business_Logic_Layer.GenderType.Female, Course = 5, StudentCardId = 111, RecordBookNumber = 111 },
+             // Підходить під умову (Дівчина, 5 курс, Київ) = 2
+             new StudentDTO { FirstName = "Марія", LastName = "Іваненко", Residence = "Київ", Gender = Business_Logic_Layer.GenderType.Female, Course = 5, StudentCardId = 222, RecordBookNumber = 222 },
+             // Не підходить (Хлопець)
+             new StudentDTO { FirstName = "Іван", LastName = "Петренко", Residence = "Київ", Gender = Business_Logic_Layer.GenderType.Male, Course = 5, StudentCardId = 333, RecordBookNumber = 333},
+             // Не підходить (4 курс)
+             new StudentDTO { FirstName = "Анна", LastName = "Сидоренко", Residence = "Київ", Gender = Business_Logic_Layer.GenderType.Female, Course = 4, StudentCardId = 444, RecordBookNumber = 444 },
+             // Не підходить (Львів)
+             new StudentDTO { FirstName = "Юлія", LastName = "Мельник", Residence = "Львів", Gender = Business_Logic_Layer.GenderType.Female, Course = 5, StudentCardId = 555, RecordBookNumber = 555 }
+            };
+
+            try
+            {
+                // Викликаємо твій метод з EntityService для збереження
+                _entityService.SaveStudents(testStudents, "students.json", ProviderType.JSON);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("\nТестовий файл 'students.json' успішно згенеровано! Тепер можна виконувати пункт 2.");
+                Console.ResetColor();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"\nПомилка при створенні файлу: {ex.Message}");
+                Console.ResetColor();
+            }
+
+            Console.ReadLine();
+        }
+
+    }   
 }
