@@ -106,21 +106,21 @@ namespace PresentationLayer
                 // ДЕМОНСТРАЦІЯ 1: Робота з масивом
                 Console.WriteLine("\n[1] Зберігаємо масив у файл...");
                 // Примітка: Тобі потрібно додати метод SaveCustomStrings(CustomStringDTO[], шлях, формат) у EntityService
-                 _entityService.SaveCustomStrings(stringsArray, filePath, format);
+                _entityService.SaveCustomStrings(stringsArray, filePath, format);
 
                 Console.WriteLine("[2] Читаємо масив з файлу...");
-                 var loadedArray = _entityService.GetCustomStrings(filePath, format);
-                 Console.WriteLine($"Завантажено об'єктів у масив: {loadedArray.Length}");
+                var loadedArray = _entityService.GetCustomStrings(filePath, format);
+                Console.WriteLine($"Завантажено об'єктів у масив: {loadedArray.Length}");
 
                 // ДЕМОНСТРАЦІЯ 2: Робота з колекцією
                 // List можна легко перетворити в масив за допомогою .ToArray() для сумісності з DAL, 
                 // або додати підтримку ICollection у провайдерах.
                 Console.WriteLine("\n[3] Зберігаємо колекцію List у файл...");
-                 _entityService.SaveCustomStrings(stringsList.ToArray(), filePath, format);
+                _entityService.SaveCustomStrings(stringsList.ToArray(), filePath, format);
 
                 Console.WriteLine("[4] Читаємо дані у колекцію List...");
-                 var loadedList = new List<CustomStringDTO>(_entityService.GetCustomStrings(filePath, format));
-                 Console.WriteLine($"Завантажено об'єктів у колекцію: {loadedList.Count}");
+                var loadedList = new List<CustomStringDTO>(_entityService.GetCustomStrings(filePath, format));
+                Console.WriteLine($"Завантажено об'єктів у колекцію: {loadedList.Count}");
 
                 Console.WriteLine("\n[Демонстрація виконана успішно]");
             }
@@ -131,9 +131,74 @@ namespace PresentationLayer
                 Console.ResetColor();
             }
 
+            
+
+            Console.WriteLine("\n=== Демонстрація серіалізації та десеріалізації (Масиви vs Колекції) ===");
+
+            // 1. СТУДЕНТИ (Масив та Колекція -> JSON)
+            StudentDTO[] studentsArray =
+            {
+              new StudentDTO { FirstName = "Олена", LastName = "Коваленко", Residence = "Київ", Gender = Business_Logic_Layer.GenderType.Female, Course = 5, StudentCardId = 101, RecordBookNumber = 5001 },
+              new StudentDTO { FirstName = "Тарас", LastName = "Шевченко", Residence = "Львів", Gender = Business_Logic_Layer.GenderType.Male, Course = 3, StudentCardId = 102, RecordBookNumber = 5002 }
+            };
+            List<StudentDTO> studentsList = new List<StudentDTO>(studentsArray);
+
+            _entityService.SaveStudents(studentsArray, "students_array.json", ProviderType.JSON);
+            StudentDTO[] restoredStudentsArray = _entityService.GetStudents("students_array.json", ProviderType.JSON);
+
+            _entityService.SaveStudents(studentsList.ToArray(), "students_list.json", ProviderType.JSON);
+            List<StudentDTO> restoredStudentsList = new List<StudentDTO>(_entityService.GetStudents("students_list.json", ProviderType.JSON));
+
+            Console.WriteLine($"\n[StudentDTO] Відновлено з масиву ({restoredStudentsArray.Length} шт.) та колекції ({restoredStudentsList.Count} шт.):");
+            foreach (var s in restoredStudentsArray)
+                Console.WriteLine("  " + new StudentViewModel(s));
+
+            // 2. ФОТОГРАФИ (Масив та Колекція -> XML)
+            PhotographerDTO[] photographersArray =
+            {
+              new PhotographerDTO { FirstName = "Ірина", LastName = "Мельник", Residence = "Київ", Gender = Business_Logic_Layer.GenderType.Female, Camera = Business_Logic_Layer.CameraType.Mirrorless },
+              new PhotographerDTO { FirstName = "Дмитро", LastName = "Бойко", Residence = "Одеса", Gender = Business_Logic_Layer.GenderType.Male, Camera = Business_Logic_Layer.CameraType.DSLR }
+            };
+            List<PhotographerDTO> photographersList = new List<PhotographerDTO>(photographersArray);
+
+            _entityService.SavePhotographers(photographersArray, "photographers_array.xml", ProviderType.XML);
+            PhotographerDTO[] restoredPhotographersArray = _entityService.GetPhotographers("photographers_array.xml", ProviderType.XML);
+
+            _entityService.SavePhotographers(photographersList.ToArray(), "photographers_list.xml", ProviderType.XML);
+            List<PhotographerDTO> restoredPhotographersList = new List<PhotographerDTO>(_entityService.GetPhotographers("photographers_list.xml", ProviderType.XML));
+
+            Console.WriteLine($"\n[PhotographerDTO] Відновлено з масиву ({restoredPhotographersArray.Length} шт.) та колекції ({restoredPhotographersList.Count} шт.):");
+            foreach (var p in restoredPhotographersArray)
+                Console.WriteLine("  " + new PhotographerViewModel(p));
+
+            // 3. СТОЛЯРИ (Масив та Колекція -> Custom)
+            JoinerDTO[] joinersArray =
+            {
+              new JoinerDTO { FirstName = "Василь", LastName = "Кравчук", Residence = "Харків", Gender = Business_Logic_Layer.GenderType.Male, SkillLevel = Business_Logic_Layer.Skilltype.Expert },
+              new JoinerDTO { FirstName = "Микола", LastName = "Савченко", Residence = "Дніпро", Gender = Business_Logic_Layer.GenderType.Male, SkillLevel = Business_Logic_Layer.Skilltype.Professional }
+            };
+            List<JoinerDTO> joinersList = new List<JoinerDTO>(joinersArray);
+
+            _entityService.SaveJoiners(joinersArray, "joiners_array.txt", ProviderType.Custom);
+            JoinerDTO[] restoredJoinersArray = _entityService.GetJoiners("joiners_array.txt", ProviderType.Custom);
+
+            _entityService.SaveJoiners(joinersList.ToArray(), "joiners_list.txt", ProviderType.Custom);
+            List<JoinerDTO> restoredJoinersList = new List<JoinerDTO>(_entityService.GetJoiners("joiners_list.txt", ProviderType.Custom));
+
+            Console.WriteLine($"\n[JoinerDTO] Відновлено з масиву ({restoredJoinersArray.Length} шт.) та колекції ({restoredJoinersList.Count} шт.):");
+            foreach (var j in restoredJoinersArray)
+                Console.WriteLine("  " + new JoinerViewModel(j));
+
+            // 4. ПОРІВНЯННЯ МАСИВУ ТА КОЛЕКЦІЇ (Вимога п.4 Частини 1)
+            Console.WriteLine("\n--- Порівняння масиву та колекції List<T> ---");
+            Console.WriteLine("• Масив (T[]): фіксований розмір, пряма підтримка провайдерами IDataProvider<T>.");
+            Console.WriteLine("• Колекція (List<T>): динамічний розмір, зручне додавання/видалення, при передачі в DAL легко конвертується через .ToArray().");
+
+            Console.WriteLine("\nНатисніть Enter для повернення в меню...");
             Console.ReadLine();
+
         }
-        
+
 
         private void RunVariant10Task()
         {

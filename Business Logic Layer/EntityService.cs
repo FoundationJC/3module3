@@ -106,6 +106,94 @@ namespace Business_Logic_Layer
             context.Save(dalStrings);
         }
 
+        public StudentDTO[] GetStudents(string filePath, ProviderType format)
+        {
+            var context = new EntityContext<Student>(filePath, format);
+            Student[] data = context.Load();
+
+            if (data == null || data.Length == 0)
+                throw new PersonNotFoundException($"У файлі '{filePath}' не знайдено студентів.");
+
+            return data.Select(s => new StudentDTO
+            {
+                FirstName = s.FirstName,
+                LastName = s.LastName,
+                Residence = s.Residence,
+                Gender = (Business_Logic_Layer.GenderType)s.Gender,
+                Course = s.Course,
+                StudentCardId = s.StudentCardId,
+                RecordBookNumber = s.RecordBookNumber
+            }).ToArray();
+        }
+
+        // ================= ФОТОГРАФИ =================
+        public void SavePhotographers(PhotographerDTO[] dtos, string filePath, ProviderType format)
+        {
+            var context = new EntityContext<Photographer>(filePath, format);
+            var dalItems = dtos.Select(p => new Photographer
+            {
+                FirstName = p.FirstName,
+                LastName = p.LastName,
+                Residence = p.Residence,
+                Gender = (Data_Access_Layer.GenderType)p.Gender,
+                Camera = (Data_Access_Layer.CameraType)p.Camera
+            }).ToArray();
+
+            context.Save(dalItems);
+        }
+
+        public PhotographerDTO[] GetPhotographers(string filePath, ProviderType format)
+        {
+            var context = new EntityContext<Photographer>(filePath, format);
+            Photographer[] data = context.Load();
+
+            if (data == null || data.Length == 0)
+                throw new PersonNotFoundException($"У файлі '{filePath}' не знайдено фотографів.");
+
+            return data.Select(p => new PhotographerDTO
+            {
+                FirstName = p.FirstName,
+                LastName = p.LastName,
+                Residence = p.Residence,
+                Gender = (Business_Logic_Layer.GenderType)p.Gender,
+                Camera = (Business_Logic_Layer.CameraType)p.Camera
+            }).ToArray();
+        }
+
+        // ================= СТОЛЯРИ =================
+        public void SaveJoiners(JoinerDTO[] dtos, string filePath, ProviderType format)
+        {
+            var context = new EntityContext<Joiner>(filePath, format);
+            var dalItems = dtos.Select(j => new Joiner
+            {
+                FirstName = j.FirstName,
+                LastName = j.LastName,
+                Residence = j.Residence,
+                Gender = (Data_Access_Layer.GenderType)j.Gender,
+                SkillLevel = (Data_Access_Layer.Skilltype)j.SkillLevel
+            }).ToArray();
+
+            context.Save(dalItems);
+        }
+
+        public JoinerDTO[] GetJoiners(string filePath, ProviderType format)
+        {
+            var context = new EntityContext<Joiner>(filePath, format);
+            Joiner[] data = context.Load();
+
+            if (data == null || data.Length == 0)
+                throw new PersonNotFoundException($"У файлі '{filePath}' не знайдено столярів.");
+
+            return data.Select(j => new JoinerDTO
+            {
+                FirstName = j.FirstName,
+                LastName = j.LastName,
+                Residence = j.Residence,
+                Gender = (Business_Logic_Layer.GenderType)j.Gender,
+                SkillLevel = (Business_Logic_Layer.Skilltype)j.SkillLevel
+            }).ToArray();
+        }
+
 
         // Метод для роботи з кастомними рядками у BLL
         public CustomStringDTO[] GetCustomStrings(string filePath, ProviderType format)
